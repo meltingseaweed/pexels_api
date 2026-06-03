@@ -2,8 +2,30 @@
     <h2>Welcome to the Pexel API<h2>
 </div>
 
-<div>
-    <p>Let's find your collections</p>
-</div>
-
 <%# Make a form which takes in an id and returns the collection below it. %>
+<% response = MyPexel.new %>
+<% response_json = response.get_all_collections %>
+
+<% id_array = [] %>
+<% response_json["collections"].each do |col| %>
+    <% id_array << col["id"] %>
+<% end %>
+
+<p>You can choose one id from the collections below:</p>
+<%= form_with url: root_path, method: :get do |form| %>
+    <%= select(:get, :collection_id, id_array) %>
+    <%= form.submit "Get photos" %>
+<% end %>
+
+<% if @collection_id != nil %>
+    <% photos = response.get_photos_from_collection(@collection_id) %>
+    <% photos["media"].each do |p| %>
+    <ul>
+        <% url = p["src"]["medium"]%>
+        <%= image_tag url, alt: "Gallery Image" %>
+        <p>Credit to: <%= p["photographer"]%> : <%= p["photographer_url"] %></p>
+    </ul>
+    <% end %>
+<% end %>
+
+
